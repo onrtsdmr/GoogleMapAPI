@@ -19,9 +19,60 @@ import "./style.css";
 let map: google.maps.Map;
 
 function initMap(): void {
+  const latLongs = [
+    { lat: 38.734802, lng: 35.467987 },
+    { lat: 38.626995, lng: 34.719975 },
+    { lat: 37.783333, lng: 29.094715 }
+  ];
+  let index = 1;
+
   map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
-    center: { lat: -34.397, lng: 150.644 },
     zoom: 8,
+    center: latLongs[0],
   });
+
+  const marker = addMarker(latLongs[2].lat, latLongs[2].lng, map, "KAYSERI");
+
+  map.addListener("center_changed", () => {
+    setInterval(() => {
+      // GoFuckYourSelf();
+    }, 5000);
+  })
+
+  function GoFuckYourSelf() {
+    if (index > latLongs.length) {
+      index = 0;
+    }
+    marker.setPosition(latLongs[index]);
+    console.log(marker.getPosition);
+    index++;
+  }
+
+  marker.addListener("click", () => {
+    map.setZoom(8);
+    map.setCenter(marker.getPosition() as google.maps.LatLng);
+  });
+
+  map.addListener("click", (e) => {
+    placeMarkerAndPanTo(e.latLng, map);
+  });
+
+
+
+  function addMarker(lat: number, long: number, map: google.maps.Map, title: string) {
+    return new google.maps.Marker({
+      position: {lat: lat, lng: long},
+      map: map,
+      title: title,
+    });
+  }
+
+  function placeMarkerAndPanTo(latLng: google.maps.LatLng, map: google.maps.Map) {
+    new google.maps.Marker({
+      position: latLng,
+      map: map,
+    });
+    map.panTo(latLng);
+  }
 }
 export { initMap };
